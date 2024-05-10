@@ -2,6 +2,7 @@
 #include "WinUtils.hpp"
 #include "../discord/DiscordRequest.hpp"
 #include "../discord/Frontend.hpp"
+#include "../discord/DiscordClientConfig.hpp"
 
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 
@@ -111,7 +112,13 @@ void NetworkerThread::FulfillRequest(NetRequest& req)
 	client.enable_server_certificate_verification(false);
 
 	Headers headers;
-	headers.insert(std::make_pair("User-Agent", GetFrontend()->GetUserAgent()));
+	headers.insert(std::make_pair("User-Agent", GetClientConfig()->GetUserAgent()));
+	headers.insert(std::make_pair("X-Super-Properties", GetClientConfig()->GetSerializedBase64Blob()));
+	headers.insert(std::make_pair("X-Discord-Timezone", GetClientConfig()->GetTimezone()));
+	headers.insert(std::make_pair("X-Discord-Locale", GetClientConfig()->GetLocale()));
+	headers.insert(std::make_pair("Sec-Ch-Ua", GetClientConfig()->GetSecChUa()));
+	headers.insert(std::make_pair("Sec-Ch-Ua-Mobile", "?0"));
+	headers.insert(std::make_pair("Sec-Ch-Ua-Platform", GetClientConfig()->GetOS()));
 
 	if (req.authorization.size())
 	{
